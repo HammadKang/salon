@@ -1,95 +1,141 @@
 # Aurelle: Luxury Salon Website
 
-A premium, fully responsive salon website with a working online-booking flow, built with Next.js, Tailwind CSS and Motion.
-"Aurelle" is a **sample brand**. Everything is driven by a few editable files, so it can be re-branded for any salon.
+A premium, fully responsive website for a beauty salon, with a complete online booking flow. Built with Next.js, Tailwind CSS and Motion.
 
-## Run it
+"Aurelle" is a sample brand. The whole site is driven by a few configuration files, so it can be re-branded for any salon without touching the UI code.
+
+## Highlights
+
+- **Cinematic hero** with parallax, word-by-word headline reveal and a clear booking call to action.
+- **Online booking in five steps:** service, stylist (or any available), date and time, details, review. Availability is calculated live from the salon's opening hours.
+- **No backend required.** Bookings are completed in the browser and delivered to the salon through a pre-written WhatsApp message.
+- **Services and pricing** with category filters, durations, "from" prices and a one-click "Book this service".
+- **Portfolio gallery** with filters and an accessible lightbox (keyboard, swipe, Escape).
+- **Considered pop-ups:** welcome offer, exit intent, booking reminder and updates sign-up, all governed by one controller with strict frequency rules.
+- **Mobile-first:** sticky call, WhatsApp and book bar, full-screen menu, no horizontal overflow from 320 px upwards.
+- **Accessible and motion-aware:** semantic landmarks, focus management in dialogs, visible focus states, and full support for `prefers-reduced-motion`.
+- **SEO ready:** metadata, Open Graph, sitemap, robots and LocalBusiness structured data (enabled once real details are supplied).
+
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| Framework | Next.js (App Router), React, TypeScript |
+| Styling | Tailwind CSS v4 |
+| Animation | Motion (`motion/react`) |
+| Icons | Lucide |
+| Fonts | Cormorant Garamond, Jost (via `next/font`) |
+| Images | `next/image` with Unsplash sources |
+| Hosting | Any static host; tested for Vercel |
+
+## Getting started
+
+Requires Node.js 20 or newer.
 
 ```bash
 npm install
 npm run dev          # http://localhost:3000
-npm run build && npm start   # production check
 ```
 
-Requires Node.js 20+.
+Other scripts:
 
-## What's inside
+```bash
+npm run build        # production build
+npm start            # serve the production build
+npm run typecheck    # TypeScript check
+```
 
-| Area | Details |
+## Project structure
+
+```
+app/                  Routes: home, privacy, sitemap, robots, icon
+components/
+  sections/           Page sections (Hero, Services, Gallery, Team, ...)
+  booking/            Booking dialog, calendar, provider
+  popups/             Pop-up controller and individual pop-ups
+  ui/                 Buttons, modal, reveal and parallax primitives
+config/salon.ts       Brand, contact, hours, offer, booking rules, pop-up timing
+data/                 Services, stylists, gallery, testimonials, FAQs
+lib/                  Booking engine, formatting, image helpers
+```
+
+## Customising the site
+
+Almost everything is editable in plain data files.
+
+| To change | Edit |
 |---|---|
-| Hero | Full-screen image with parallax, word-by-word headline reveal, two CTAs, scroll cue |
-| Navigation | Transparent over the hero, sticky ivory header on scroll, animated underlines, active-section highlight, full-screen mobile menu with focus trap |
-| Services | 15 services in 7 categories. Shows 6 first with **View all**, compact rows on mobile, animated filter tabs, duration, "from" price, promo labels, **Book this service** (the choice carries into the booking flow) |
-| Signature treatments | Large editorial rows with parallax imagery |
-| About, Team | Layered imagery, stylist profiles, "Book with …" preselects the stylist |
-| Gallery | Masonry grid, category filter, lightbox with arrows, keyboard, swipe and Esc |
-| Booking | 5 steps: service, stylist (or any available), date and time, details, review. Then a confirmation with reference, "send to salon on WhatsApp", add-to-calendar (.ics) and copy-details |
-| Pop-ups | Welcome offer, exit intent (desktop mouse only), booking reminder, updates (WhatsApp). Managed by one controller |
-| Trust and info | How booking works, testimonials carousel, offers, FAQ accordion, hours, click-to-call, WhatsApp, map, mobile sticky action bar |
-| SEO | Metadata, Open Graph, sitemap, robots, LocalBusiness JSON-LD (see below) |
+| Name, contact details, address, opening hours, social links, currency | `config/salon.ts` |
+| Booking rules (slot length, notice, window), offer and pop-up timing | `config/salon.ts` |
+| Closed dates and already-taken times | `closedDates` and `blockedSlots` in `config/salon.ts` |
+| Services, durations and prices | `data/services.ts` |
+| Team | `data/stylists.ts` |
+| Gallery, testimonials, FAQs, offers | `data/content.ts` |
+| Photos | `lib/images.ts` (Unsplash ids) or any file in `public/` |
+| Colours and typography | `app/globals.css` (`@theme`) and `app/layout.tsx` |
 
-## Customise (no UI code needed)
+Opening hours, service durations and stylist days off feed the booking engine directly, so editing them changes which times customers can choose.
 
-| What | Where |
-|---|---|
-| Name, contact, address, **opening hours**, social links, currency, booking rules, offer, pop-up timing, SEO | `config/salon.ts` |
-| Services and prices | `data/services.ts` |
-| Stylists | `data/stylists.ts` |
-| Gallery, testimonials, FAQs, offers, "how it works" | `data/content.ts` |
-| Photos | `lib/images.ts` (Unsplash ids) or any `/public` file |
-| Colours and fonts | `app/globals.css` (`@theme`) and `app/layout.tsx` |
+## How booking works
 
-Opening hours, durations and stylist days off in these files are used by the **real availability engine**, so changing them changes which slots customers can book.
+Everything runs in the visitor's browser. There is no server, database or API to host.
 
-## How booking works (no backend, no API)
+1. **Live availability.** Time slots are calculated from opening hours, service duration, stylist working days, minimum notice and the booking window.
+2. **Instant confirmation screen.** After confirming, the customer sees a booking reference, an add-to-calendar file and a copy-details button.
+3. **Delivery to the salon.** A **Send to salon on WhatsApp** button opens WhatsApp with the complete booking pre-written (reference, service, stylist, time, name, phone, notes, total). The salon receives it on its own WhatsApp number and confirms the slot.
+4. **Remembered on the device.** The customer's bookings are stored in the browser, so they see their upcoming bookings on return and the same slot cannot be booked twice from that device.
 
-Everything runs in the visitor's browser. There is no server, no database and no API to host or pay for.
+### Limitations of the no-backend design
 
-1. **Live availability.** Slots are calculated on the spot from the salon's opening hours, each service's duration, stylists' days off, the minimum notice and the booking window (all in `config/salon.ts` and `data/`).
-2. **Instant feedback.** The customer picks service, stylist, date and time, fills in their details and confirms. They immediately see a "Booking received" screen with a booking reference, add-to-calendar and a copy-details button.
-3. **It reaches the salon through WhatsApp.** The confirmation screen has a **Send to salon on WhatsApp** button that opens WhatsApp with the full booking pre-written (reference, service, stylist, time, name, phone, notes, total). The salon gets the booking on its own WhatsApp number and confirms the slot.
-4. **Saved on the customer's device.** Their bookings are remembered in the browser (`localStorage`), so they see "Your upcoming bookings" next time and the same slot can't be booked twice on that device.
-
-**Be aware of the limits of a no-backend design:**
-- Availability is **not shared between customers**. Two different people can pick the same time, and the salon resolves it when the WhatsApp message arrives. The page says "received" and asks the customer to send it to the salon; it never claims the salon has confirmed.
-- To keep the page in step with the real diary, the salon edits two lists in `config/salon.ts`: `closedDates` (holidays) and `blockedSlots` (times already taken). Redeploy and the calendar updates for everyone.
-- A real shared diary and automatic salon notifications need a backend. That can be added later without changing the design.
-
-**Before going live:** the WhatsApp/phone number is set, but the address (a Karachi example), email (`contactus@aurellesalon.com`), prices, team names and photos, and the three reviews are **placeholder content**. Replace them with the salon's real details in `config/salon.ts` and `data/`. In particular, publish only real client reviews. Set `verified: true` once everything is real to switch on the LocalBusiness structured data for Google. The map (`showMap`) uses whatever address is in the config. The 10% first-visit offer is a sample too: the booking records the code and the salon decides eligibility at the visit; set `offer.enabled: false` if there is no offer.
-
-## Environment variables
-
-Copy `.env.example` to `.env.local`. All are optional.
-
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Live URL for SEO, sitemap and Open Graph |
-| `NEXT_PUBLIC_SALON_PHONE` | Overrides the phone number |
-| `NEXT_PUBLIC_SALON_WHATSAPP` | Overrides the WhatsApp number (digits only, with country code). This is where bookings arrive |
+- Availability is **not shared between customers**. Two people can choose the same time; the salon resolves it when the WhatsApp message arrives. The interface therefore says "booking received" and asks the customer to send it, rather than claiming the salon has confirmed.
+- To keep the calendar aligned with the real diary, update `closedDates` and `blockedSlots` in `config/salon.ts` and redeploy.
+- A shared live diary and automatic notifications to the salon require a backend. The booking logic in `lib/booking/` is separated from the UI so one can be added later.
 
 ## Pop-up behaviour
 
-All timings are in `config/salon.ts → popups`.
-- Never two at once, never while the booking dialog is open, never on first paint
-- Maximum 2 per session and a minimum gap between pop-ups
-- Each type has its own cool-down (remembered in the browser)
-- Welcome offer: after 30 s and 25% scroll. Updates pop-up (join by WhatsApp): later, deeper in the page
-- Exit intent: desktop mouse only, after 20 s on the page, never on touch devices
-- Booking reminder: a small non-blocking card after the visitor has spent time on Services without opening booking
-- All have close buttons, Esc to close, focus trapping and fit small screens
+All timings live in `config/salon.ts` under `popups`.
 
-## Accessibility and motion
+- Never two at once, never while the booking dialog is open, never on first paint.
+- At most two per session, with a minimum gap between them.
+- Each type has its own cool-down, remembered in the browser.
+- Welcome offer: after 30 seconds and 25% scroll.
+- Exit intent: desktop mouse only, after 20 seconds on the page. Not simulated on touch devices.
+- Booking reminder: a small, non-blocking card after time spent on the services section without starting a booking.
+- Every pop-up has a close button, closes on Escape, traps focus and fits small screens.
 
-- Semantic landmarks, skip link, visible focus rings, labelled form fields, ARIA for tabs, accordion, dialogs and progress
-- All animation respects `prefers-reduced-motion` (Motion's `MotionConfig` plus CSS)
-- Animations use transforms and opacity only; scroll effects use Motion's scroll hooks, not scroll handlers
+## Environment variables
 
-## Deploy to Vercel
+All optional. Copy `.env.example` to `.env.local` for local use.
 
-1. Push to GitHub and import the repo in Vercel (defaults are fine).
-2. Set `NEXT_PUBLIC_SITE_URL`.
-3. Put the real WhatsApp number in `config/salon.ts` so bookings reach the salon.
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Public URL used for SEO, sitemap and Open Graph |
+| `NEXT_PUBLIC_SALON_PHONE` | Overrides the displayed phone number |
+| `NEXT_PUBLIC_SALON_WHATSAPP` | Overrides the WhatsApp number (digits only, with country code). Bookings arrive here |
+| `NEXT_PUBLIC_SALON_EMAIL` | Overrides the contact email |
 
-## Verified
+## Deployment
 
-Type-check and production build pass (every route is static). Tested in a browser: full booking flow end to end with zero network calls, slot removal after booking, upcoming-bookings list, WhatsApp message contents, form validation, the lightbox, welcome and exit-intent pop-ups, and no horizontal overflow at 320 px wide. **Lighthouse / Core Web Vitals were not measured**, so please run them on your deployed site.
+1. Push the repository to GitHub.
+2. Import it into Vercel (defaults work).
+3. Set `NEXT_PUBLIC_SITE_URL` to the production URL.
+4. Confirm the WhatsApp number in `config/salon.ts`, since this is where bookings are delivered.
+
+## Before going live
+
+The following are placeholders and must be replaced with the salon's real information:
+
+- Address (a Karachi example), email domain (`aurellesalon.com`), prices, team names and portraits, and the three testimonials. Publish only genuine client reviews.
+- The 10% first-visit offer is a sample. The booking records the code and the salon decides eligibility at the visit. Set `offer.enabled: false` if there is no offer.
+- Set `verified: true` in `config/salon.ts` once all details are real, which enables LocalBusiness structured data for search engines. The map (`showMap`) uses the address in the config.
+- Review the privacy policy text with a legal professional.
+
+## Quality checks
+
+- Type-check and production build pass; every route is statically generated.
+- Verified in Chrome with scripted checks: the full booking flow, form validation, services filtering, lightbox, FAQ, mobile menu, sticky mobile bar, pop-up timing and dismissal, reduced-motion behaviour, and no horizontal overflow at 320, 390, 768, 1024 and 1440 px.
+- Lighthouse and Core Web Vitals have not been measured. Run them against the deployed site.
+
+## Disclaimer
+
+Photography is sourced from Unsplash for demonstration. Confirm licensing and replace with the salon's own imagery before launch.
