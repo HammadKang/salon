@@ -1,5 +1,7 @@
 # Aurelle: Luxury Salon Website
 
+**Live site: [salon-khaki-three.vercel.app](https://salon-khaki-three.vercel.app/)**
+
 A premium, fully responsive website for a beauty salon, with a complete online booking flow. Built with Next.js, Tailwind CSS and Motion.
 
 "Aurelle" is a sample brand. The whole site is driven by a few configuration files, so it can be re-branded for any salon without touching the UI code.
